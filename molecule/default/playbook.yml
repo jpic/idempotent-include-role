@@ -1,0 +1,8 @@
+---
+- name: Converge
+  hosts: all
+  roles:
+  - role: idempotent_include_role
+    vars:
+      role_name: idempotent_include_role
+  - role: idempotent_include_role

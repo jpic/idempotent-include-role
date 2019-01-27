@@ -1,0 +1,20 @@
+---
+
+- name: Idempotent role inclusion
+  block:
+  - assert:
+      that:
+      - ansible_facts.ansible_local[role_name]
+  rescue:
+  - include_role: name={{ role_name }}
+  - file: path=/etc/ansible/facts.d state=directory
+  - set_fact: '{{ role_name }}="installed"'
+  - shell:
+      cmd: |
+        cat > /etc/ansible/facts.d/{{ role_name }}.fact << EOF
+        #!/bin/sh
+        echo '{"{{ role_name }}" : "installed"}'
+        EOF
+  - file: path=/etc/ansible/facts.d/{{ role_name }}.fact mode=0755
+  - meta: flush_handlers
+  - setup: filter=ansible_local
